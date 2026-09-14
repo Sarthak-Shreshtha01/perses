@@ -43,7 +43,10 @@ interface ResourceListProps {
 }
 
 function SearchErrorAlert({ title, error }: { title: string; error: StatusError }): ReactElement {
-  const detail = error.message?.trim() || 'Unknown error';
+  // Avoid surfacing raw backend/RBAC text (resource kinds, scopes, ...) to end users on a
+  // permission failure - it's unactionable for them and leaks internal details.
+  const detail =
+    error.status === 403 ? 'you do not have permission to view this' : error.message?.trim() || 'Unknown error';
 
   return (
     <Box sx={{ margin: 1 }}>
