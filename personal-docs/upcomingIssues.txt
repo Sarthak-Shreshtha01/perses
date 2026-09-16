@@ -1,0 +1,52 @@
+⭐ The Top Verified Open, Unworked Issues
+Here are the best genuinely open issues that have zero PRs, zero assignees, no contention, and are great for someone starting out:
+
+1. Issue #4440 — Support search by tags in project view [DONE locally — PR pending]
+Labels: ui
+Location: Inside this repository (ui/app/src/components/DashboardList/DashboardTreeList.tsx, ui/app/src/utils/dashboardTableUtils.ts)
+Status: Fixed on branch `fix/project-view-tags-search` (commits 878c56e3, 9265cbae, 13bb9179). Still open on GitHub — just needs a PR opened against perses/perses to close it out.
+Thread Analysis:
+Filed September 11, 2026 by core maintainer @AntoineThebaud. The dashboard list search only matched name, not tags, because the tags column's cellDescription returned '', so TanStack Table's default global-filter eligibility check (string/number only) ignored the string[] tags.
+Fix applied: added a derived tagsSearchValue (tags joined into a single string) used for filtering/sorting, while the tag chips still render from the original tags array; added regression tests.
+Difficulty: ⭐ Easy (Beginner Friendly)
+
+
+3. Issue #3199 — Executing Queries by pressing the Enter Button 
+
+Labels: ui, priority/P1
+Location: @perses-dev/plugin-system (QueryEditorContainer in perses/shared)
+Assignees / PRs: None (0 comments, 0 PRs).
+Thread Analysis:
+Originally requested by maintainer @Nexucis. Confirmed still unimplemented — no Enter-key handling exists anywhere in the current QueryEditorContainer source. Pressing Enter should run the query; a modifier (e.g. Shift+Enter) should still allow a newline for multi-line queries.
+Difficulty: ⭐⭐ Medium (keyboard event handling without breaking multi-line input)
+Note: Located in perses/shared.
+
+4. Issue #3430 — Lack of proper exception handling in Search Bar
+Labels: good first issue
+Location: Inside this repository (ui/app/src/components/Header/SearchBar/SearchBar.tsx)
+Assignees / PRs: None (1 comment, 0 PRs).
+Thread Analysis:
+SearchDashboardList reads `error` from its query hooks and renders an <Alert severity="error"> on failure, but SearchProjectList, SearchGlobalDatasource, and SearchDatasourceList only use `.data ?? []` and never check `.error` — a failed fetch silently looks like "no results" instead of surfacing the failure. Confirmed still present in current code.
+Difficulty: ⭐ Easy (mirror the existing error-handling pattern from SearchDashboardList onto the other three)
+Why it's great: 100% inside this workspace (ui/app), no perses/shared link needed, easy to unit test with Vitest.
+
+5. Issue #4429 — TimeSeriesChart: improve the series coloring behavior
+Labels: (none)
+Location: TimeSeriesChart panel plugin (perses/plugins repo)
+Assignees / PRs: None (0 comments, 0 PRs).
+Thread Analysis:
+Filed by maintainer @Gladorme himself: the "auto" color-picking algorithm for chart series can assign visually similar colors to adjacent series. Historical context: an older hardcoded-palette approach (red→blue→yellow→green...) was intentionally replaced (PRs #1088, #1124) to fix different problems, so this isn't a simple revert — it needs a genuinely better algorithm. The reporter flags it as possibly more "feature" than "bug".
+Difficulty: ⭐⭐⭐ Hard (design/algorithm work, contentious history, different repo)
+Note: Located in perses/plugins, not perses/shared or perses/perses.
+
+Checked and ruled out this session (not added):
+- #2006 (Dynamic browser tab naming): blocked by maintainer decision, not a code gap. Thread: Gladorme — "Probably will be easier to do with React 19" (native <title> support); when asked about react-helmet as a stopgap, replied "we plan to move to React 19 asap... we should wait for native implem and not use react-helmet, it has long been abandoned/unmaintained/stale." Still on React 18.3 as of this check — do not pick up until the React 19 migration lands.
+- #4034 (Refactor dashboard-client.ts to use @perses-dev/dashboards types): appears already resolved by an unrelated consolidation. Current ui/app/src/model/dashboard-client.ts already imports DashboardResource from @perses-dev/client (not @perses-dev/core, which isn't even a dependency of ui/app anymore), and @perses-dev/dashboards's own type declarations also reference @perses-dev/client. The type divergence the issue describes no longer exists — likely just needs a comment + close on GitHub rather than new code.
+- #3222 (Viewport scrolls/jumps when hovering the chart): already fixed. The installed @perses-dev/components's TimeChartTooltip.js uses a useLayoutEffect to reposition the tooltip synchronously (comment: "prevent one-frame viewport overflow") and assembleTransform() clamps the tooltip's position within the container/viewport bounds. The reported jitter is no longer reproducible against current code.
+
+Recommendation
+Top Choice: #3430 (Search Bar exception handling).
+Fully self-contained to this repo (ui/app), unassigned, confirmed still broken, and a small, easily testable diff — no perses/shared link needed.
+Also actionable now: #4440 is functionally done on this branch already — the remaining step is opening the PR against perses/perses.
+Alternative Choices: #3258 (CSS/flexbox + container-query fix, but lives in perses/shared) or #3199 (Enter-to-run queries, also perses/shared, more of a keyboard-handling/UX task).
+Lower priority: #4429 — valid but design-sensitive, historically contentious, and in a different repo (perses/plugins).
